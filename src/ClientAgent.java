@@ -14,6 +14,8 @@ public class ClientAgent extends Agent{
 
     private ACLMessage Mess_Snd = new ACLMessage(ACLMessage.REQUEST);
     private ACLMessage Mess_Rcv;
+    Integer Flag = 0;
+    int Num_mess = 0;
 
     @Override
     protected void setup()
@@ -26,16 +28,24 @@ public class ClientAgent extends Agent{
         {
             protected void onTick()
             {
-
-
-                AID server = Fnd_Serv(myAgent)[Rand(0, Fnd_Serv(myAgent).length-1)].getName(); //wyszukiwanie dostepnych sererów
-                System.out.println(server);
-
-                Mess_Rcv = myAgent.receive();
-
-                if (Mess_Rcv == null)
+                if(Flag == 1)
                 {
-                    Snd_Mess(server,myAgent); //odbiór tokena
+                    Flag = 0;
+                }
+                else
+                {
+                    AID server = Fnd_Serv(myAgent)[Rand(0, Fnd_Serv(myAgent).length-1)].getName(); //wyszukiwanie dostepnych sererów
+                    Mess_Rcv = myAgent.receive();
+                    if (Mess_Rcv != null)
+                    {
+                        Rcv_Mess(myAgent); //odbiór tokena
+                    }
+                    else
+                    {
+                        Snd_Mess(server,myAgent);//wysyłanie żadania
+                        block();
+                    }
+
                 }
             }
         });
@@ -45,6 +55,21 @@ public class ClientAgent extends Agent{
     {
         Mess_Snd.addReceiver(Ser_Ag);
         Ag.send(Mess_Snd);
+    }
+    public void Rcv_Mess(Agent Ag)
+    {
+        if (Mess_Rcv.getPerformative() == ACLMessage.INFORM)//
+            Flag = 1;
+        else if (Mess_Rcv.getPerformative() == ACLMessage.CANCEL) {
+            Flag = 1;
+            System.out.println(Ag.getName() + " odebral: " + Num_mess + " tokenów");
+            Ag.doDelete();
+        } else {
+            System.out.println("Agent klient: " + Ag.getName() + " odebral od agenta servera: " +
+                    Mess_Rcv.getSender().getName() + " token: " + Mess_Rcv.getContent().toString());
+            Num_mess++;
+            Flag = 1;
+        }
     }
 
     public static Integer Rand(Integer Start, Integer Stop)
