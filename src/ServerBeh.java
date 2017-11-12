@@ -15,9 +15,21 @@ public class ServerBeh extends CyclicBehaviour {
         {
             ACLMessage Answ = Msg.createReply();
 
+            if(token_interior.getQue().isEmpty() == false)//Tworzenie wiadomosci gdy dostepny jest token
+            {
                 Answ.setContent(token_interior.Get_Tok());
                 System.out.println("Wysylam token do: " + Msg.getSender().getName());
-                myAgent.send(Answ);
+            }
+            else if(token_interior.getQue().isEmpty())
+            {
+                if(token_interior.Is_Full())//wygenerowano wszystkie wiadomosci
+                    Answ.setPerformative(ACLMessage.CANCEL);
+                else                        //brak tokenu ale nie wygenerowano wszystkich
+                    Answ.setPerformative(ACLMessage.INFORM);
+            }
+            myAgent.send(Answ);
+        }else{
+            block();
         }
 
 
