@@ -1,6 +1,9 @@
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
-
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPAException;
 
 
 import java.util.Random;
@@ -14,6 +17,21 @@ public class ServerAgent extends Agent
     {
         super.setup();
         System.out.println("Dodaje Server Agent");
+
+        DFAgentDescription DFAD = new DFAgentDescription();
+        DFAD.setName(getAID());
+        ServiceDescription SD = new ServiceDescription();
+        SD.setType("Sender");
+        SD.setName("Token");
+        DFAD.addServices(SD);
+        try
+        {
+            DFService.register(this, DFAD);
+        }
+        catch(FIPAException fe)
+        {
+            fe.printStackTrace();
+        }
 
         ServerBeh Se_tok_beh = new ServerBeh();//wywołuje action()
         addBehaviour(Se_tok_beh);
