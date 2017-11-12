@@ -8,6 +8,18 @@ public class ServerBeh extends CyclicBehaviour {
 
     public void action()
     {
+        MessageTemplate Mess_Tem = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);//wzor wiadomosci
+        ACLMessage Msg = myAgent.receive(Mess_Tem);//czekanie na wiadomosc o zadanym wzorze
+
+        if (Msg != null)
+        {
+            ACLMessage Answ = Msg.createReply();
+
+                Answ.setContent(token_interior.Get_Tok());
+                System.out.println("Wysylam token do: " + Msg.getSender().getName());
+                myAgent.send(Answ);
+        }
+
 
     }
 

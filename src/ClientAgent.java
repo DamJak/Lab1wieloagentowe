@@ -12,6 +12,8 @@ import java.util.Random;
 
 public class ClientAgent extends Agent{
 
+    private ACLMessage Mess_Snd = new ACLMessage(ACLMessage.REQUEST);
+    private ACLMessage Mess_Rcv;
 
     @Override
     protected void setup()
@@ -28,8 +30,21 @@ public class ClientAgent extends Agent{
 
                 AID server = Fnd_Serv(myAgent)[Rand(0, Fnd_Serv(myAgent).length-1)].getName(); //wyszukiwanie dostepnych sererów
                 System.out.println(server);
+
+                Mess_Rcv = myAgent.receive();
+
+                if (Mess_Rcv == null)
+                {
+                    Snd_Mess(server,myAgent); //odbiór tokena
+                }
             }
         });
+    }
+
+    public void Snd_Mess(AID Ser_Ag, Agent Ag)
+    {
+        Mess_Snd.addReceiver(Ser_Ag);
+        Ag.send(Mess_Snd);
     }
 
     public static Integer Rand(Integer Start, Integer Stop)
